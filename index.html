@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>📦Sistem Gudang</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body, html {height: 100%; margin: 0;}
+  body {background:#f10202; display: flex; justify-content: center; align-items: center;}
+  #loginCard {width: 350px;}
+  #mainContent {display: none; height: 100vh; overflow: auto;}
+  /* Dashboard sidebar */
+  #sidebar {background: #f8f9fa; height: 100%; padding: 20px;}
+  #sidebar h4 {margin-bottom: 20px;}
+  #sidebar .nav-link {color: #333; margin-bottom: 5px;}
+  #sidebar .nav-link.active {font-weight: bold;}
+  #mainArea {padding: 20px;}
+  .card.shadow {box-shadow: 0 10px 20px rgba(0,0,0,0.8);}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginCard" class="card shadow">
+  <div class="card-body">
+    <h4 class="card-title text-center mb-3">Login Sistem Gudang</h4>
+    <form id="loginForm">
+      <input class="form-control mb-2" name="username" placeholder="Username" required>
+      <input class="form-control mb-3" name="password" type="password" placeholder="Password" required>
+      <button type="submit" class="btn btn-primary w-100">Login</button>
+      <div id="errorMsg" class="text-danger mt-2 text-center"></div>
+    </form>
+  </div>
+</div>
+
+<!-- SISTEM GUDANG / DASHBOARD -->
+<div id="mainContent" class="container-fluid">
+  <div class="row" style="height:100%;">
+    <!-- Sidebar kiri -->
+    <div id="sidebar" class="col-md-3">
+      <h4>Dashboard</h4>
+      <button class="btn btn-danger mb-3 w-100" onclick="logout()">Logout</button>
+      <ul class="nav flex-column">
+        <li class="nav-item"><button class="nav-link active btn btn-link text-start" data-bs-toggle="tab" data-bs-target="#master">Master Barang</button></li>
+        <li class="nav-item"><button class="nav-link btn btn-link text-start" data-bs-toggle="tab" data-bs-target="#gudang">Data Gudang</button></li>
+        <li class="nav-item"><button class="nav-link btn btn-link text-start" data-bs-toggle="tab" data-bs-target="#masuk">Data Masuk</button></li>
+        <li class="nav-item"><button class="nav-link btn btn-link text-start" data-bs-toggle="tab" data-bs-target="#keluar">Data Keluar</button></li>
+      </ul>
+    </div>
+
+    <!-- Konten utama -->
+    <div id="mainArea" class="col-md-9">
+      <div class="tab-content">
+        <!-- MASTER -->
+        <div class="tab-pane fade show active" id="master">
+          <div class="d-flex justify-content-between mb-3">
+            <h4>Master Barang</h4>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalMaster">+ Tambah</button>
+          </div>
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-secondary text-center">
+              <tr><th>ID</th><th>Nama</th><th>Jenis</th><th>Aksi</th></tr>
+            </thead>
+            <tbody id="tabelMaster"></tbody>
+          </table>
+        </div>
+
+        <!-- GUDANG -->
+        <div class="tab-pane fade" id="gudang">
+          <div class="d-flex justify-content-between mb-3">
+            <h4>Data Gudang</h4>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalGudang">+ Tambah</button>
+          </div>
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-secondary text-center">
+              <tr>
+                <th>ID</th><th>Nama</th><th>Lokasi</th><th>Stok</th><th>Petugas</th><th>Gudang</th>
+                <th>Tanggal Masuk Terakhir</th><th>Tanggal Keluar Terakhir</th><th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tabelGudang"></tbody>
+          </table>
+        </div>
+
+        <!-- DATA MASUK -->
+        <div class="tab-pane fade" id="masuk">
+          <div class="d-flex justify-content-between mb-3">
+            <h4>Data Masuk</h4>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalMasuk">+ Tambah</button>
+          </div>
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-secondary text-center">
+              <tr><th>ID</th><th>Nama</th><th>Jumlah</th><th>Posisi</th><th>Gudang</th><th>Petugas</th><th>Tanggal</th></tr>
+            </thead>
+            <tbody id="tabelMasuk"></tbody>
+          </table>
+        </div>
+
+        <!-- DATA KELUAR -->
+        <div class="tab-pane fade" id="keluar">
+          <div class="d-flex justify-content-between mb-3">
+            <h4>Data Keluar</h4>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalKeluar">+ Tambah</button>
+          </div>
+          <table class="table table-bordered table-hover align-middle">
+            <thead class="table-secondary text-center">
+              <tr><th>ID</th><th>Nama</th><th>Jumlah</th><th>Posisi</th><th>Gudang</th><th>Petugas</th><th>Tanggal</th></tr>
+            </thead>
+            <tbody id="tabelKeluar"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MASTER -->
+<div class="modal fade" id="modalMaster" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5>Tambah Master</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="formMaster">
+        <input class="form-control mb-2" name="id" placeholder="ID Barang" required>
+        <input class="form-control mb-2" name="nama" placeholder="Nama Barang" required>
+        <input class="form-control mb-2" name="jenis" placeholder="Jenis Barang">
+        <button type="submit" class="btn btn-success w-100">Simpan</button>
+      </form>
+    </div>
+  </div></div>
+</div>
+
+<!-- MODAL GUDANG -->
+<div class="modal fade" id="modalGudang" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5>Tambah Data Gudang</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="formGudang">
+        <input class="form-control mb-2" name="id" placeholder="ID Barang" required>
+        <input class="form-control mb-2" name="nama" placeholder="Nama Barang" required>
+        <input class="form-control mb-2" name="lokasi" placeholder="Lokasi Barang">
+        <input class="form-control mb-2" name="stok" type="number" placeholder="Stok">
+        <input class="form-control mb-2" name="petugas" placeholder="Petugas">
+        <input class="form-control mb-2" name="gudang" placeholder="Gudang">
+        <button type="submit" class="btn btn-primary w-100">Simpan</button>
+      </form>
+    </div>
+  </div></div>
+</div>
+
+<!-- MODAL MASUK -->
+<div class="modal fade" id="modalMasuk" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5>Tambah Data Masuk</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="formMasuk">
+        <input class="form-control mb-2" name="id" placeholder="ID Barang" required>
+        <input class="form-control mb-2" name="nama" placeholder="Nama Barang" required>
+        <input class="form-control mb-2" name="jumlah" type="number" placeholder="Jumlah Masuk" required>
+        <input class="form-control mb-2" name="posisi" placeholder="Posisi">
+        <input class="form-control mb-2" name="gudang" placeholder="Gudang">
+        <input class="form-control mb-2" name="petugas" placeholder="Petugas">
+        <div class="mb-2"><label>Tanggal Masuk</label>
+        <input type="date" class="form-control" name="tanggal" required></div>
+        <button type="submit" class="btn btn-success w-100">Simpan</button>
+      </form>
+    </div>
+  </div></div>
+</div>
+
+<!-- MODAL KELUAR -->
+<div class="modal fade" id="modalKeluar" tabindex="-1">
+  <div class="modal-dialog"><div class="modal-content">
+    <div class="modal-header"><h5>Tambah Data Keluar</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <form id="formKeluar">
+        <input class="form-control mb-2" name="id" placeholder="ID Barang" required>
+        <input class="form-control mb-2" name="nama" placeholder="Nama Barang" required>
+        <input class="form-control mb-2" name="jumlah" type="number" placeholder="Jumlah Keluar" required>
+        <input class="form-control mb-2" name="posisi" placeholder="Posisi">
+        <input class="form-control mb-2" name="gudang" placeholder="Gudang">
+        <input class="form-control mb-2" name="petugas" placeholder="Petugas">
+        <div class="mb-2"><label>Tanggal Keluar</label>
+        <input type="date" class="form-control" name="tanggal" required></div>
+        <button type="submit" class="btn btn-danger w-100">Simpan</button>
+      </form>
+    </div>
+  </div></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// LOGIN
+const loginForm = document.getElementById('loginForm');
+const errorMsg = document.getElementById('errorMsg');
+const loginCard = document.getElementById('loginCard');
+const mainContent = document.getElementById('mainContent');
+
+let usersDB = [
+  {username:'admin',password:'12345',role:'admin'},
+  {username:'staff1',password:'pass',role:'staff'}
+];
+
+loginForm.addEventListener('submit', e=>{
+  e.preventDefault();
+  const fd = new FormData(e.target);
+  const u = fd.get('username'), p = fd.get('password');
+  const user = usersDB.find(x=>x.username===u && x.password===p);
+  if(user){
+    loginCard.style.display='none';
+    mainContent.style.display='block';
+  }else{
+    errorMsg.textContent='Username / Password salah!';
+  }
+});
+
+function logout(){ 
+  mainContent.style.display='none'; 
+  loginCard.style.display='block'; 
+}
+
+// DATA
+let masterBarang = [
+  {id:'BRG001',nama:'Monitor LG 24"',jenis:'Elektronik'},
+  {id:'BRG002',nama:'Kursi Kantor',jenis:'Perabotan'}
+];
+let gudangBarang = [
+  {id:'BRG001',nama:'Monitor LG 24"',lokasi:'Rak A1',stok:10,petugas:'Rizal',gudang:'Gudang Utama',tanggal_masuk:'2025-10-15',tanggal_keluar:''},
+  {id:'BRG002',nama:'Kursi Kantor',lokasi:'Rak B2',stok:25,petugas:'Andi',gudang:'Gudang 2',tanggal_masuk:'2025-10-10',tanggal_keluar:''}
+];
+let dataMasuk = [], dataKeluar = [];
+
+const tabelMaster = document.getElementById('tabelMaster');
+const tabelGudang = document.getElementById('tabelGudang');
+const tabelMasuk = document.getElementById('tabelMasuk');
+const tabelKeluar = document.getElementById('tabelKeluar');
+
+// RENDER
+function renderMaster(){ tabelMaster.innerHTML=""; masterBarang.forEach((b,i)=>{ 
+  tabelMaster.innerHTML+=`<tr><td>${b.id}</td><td>${b.nama}</td><td>${b.jenis||''}</td>
+  <td class="text-center"><button class="btn btn-sm btn-warning" onclick="editMaster(${i})">Edit</button>
+  <button class="btn btn-sm btn-danger" onclick="hapusMaster(${i})">Hapus</button></td></tr>`;}); }
+
+function renderGudang(){ tabelGudang.innerHTML=""; gudangBarang.forEach((b,i)=>{ 
+  tabelGudang.innerHTML += `<tr>
+    <td>${b.id}</td><td>${b.nama}</td><td>${b.lokasi||''}</td><td>${b.stok||0}</td>
+    <td>${b.petugas||''}</td><td>${b.gudang||''}</td>
+    <td>${b.tanggal_masuk||''}</td>
+    <td>${b.tanggal_keluar||''}</td>
+    <td class="text-center">
+      <button class="btn btn-sm btn-warning" onclick="editGudang(${i})">Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="hapusGudang(${i})">Hapus</button>
+    </td>
+  </tr>`;}); }
+
+function renderMasuk(){ tabelMasuk.innerHTML = ""; dataMasuk.forEach(b=>{
+  tabelMasuk.innerHTML += `<tr><td>${b.id}</td><td>${b.nama}</td><td>${b.jumlah}</td><td>${b.posisi||''}</td>
+    <td>${b.gudang||''}</td><td>${b.petugas||''}</td><td>${b.tanggal}</td></tr>`;}); }
+
+function renderKeluar(){ tabelKeluar.innerHTML = ""; dataKeluar.forEach(b=>{
+  tabelKeluar.innerHTML += `<tr><td>${b.id}</td><td>${b.nama}</td><td>${b.jumlah}</td><td>${b.posisi||''}</td>
+    <td>${b.gudang||''}</td><td>${b.petugas||''}</td><td>${b.tanggal}</td></tr>`;}); }
+
+// MASTER
+document.getElementById('formMaster').addEventListener('submit', e=>{
+  e.preventDefault(); 
+  const fd = new FormData(e.target);
+  masterBarang.push({id:fd.get('id'),nama:fd.get('nama'),jenis:fd.get('jenis')});
+  renderMaster(); 
+  e.target.reset(); 
+  bootstrap.Modal.getInstance(document.getElementById('modalMaster')).hide();
+});
+
+// GUDANG
+document.getElementById('formGudang').addEventListener('submit', e=>{
+  e.preventDefault(); 
+  const fd = new FormData(e.target);
+  let item = {id:fd.get('id'),nama:fd.get('nama'),lokasi:fd.get('lokasi'),stok:parseInt(fd.get('stok')||0),
+    petugas:fd.get('petugas'),gudang:fd.get('gudang'),tanggal_masuk:'',tanggal_keluar:''};
+  gudangBarang.push(item); renderGudang();
+  e.target.reset(); bootstrap.Modal.getInstance(document.getElementById('modalGudang')).hide();
+});
+
+// MASUK
+document.getElementById('formMasuk').addEventListener('submit', e=>{
+  e.preventDefault(); 
+  const fd = new FormData(e.target);
+  let jumlah = parseInt(fd.get('jumlah')); let tanggal = fd.get('tanggal');
+  dataMasuk.push({id:fd.get('id'),nama:fd.get('nama'),jumlah:jumlah,posisi:fd.get('posisi'),gudang:fd.get('gudang'),petugas:fd.get('petugas'),tanggal:tanggal});
+  let item = gudangBarang.find(x=>x.id===fd.get('id'));
+  if(item){ item.stok += jumlah; item.tanggal_masuk = tanggal; renderGudang();}
+  renderMasuk(); e.target.reset(); bootstrap.Modal.getInstance(document.getElementById('modalMasuk')).hide();
+});
+
+// KELUAR
+document.getElementById('formKeluar').addEventListener('submit', e=>{
+  e.preventDefault(); 
+  const fd = new FormData(e.target);
+  let jumlah = parseInt(fd.get('jumlah')); let tanggal = fd.get('tanggal');
+  dataKeluar.push({id:fd.get('id'),nama:fd.get('nama'),jumlah:jumlah,posisi:fd.get('posisi'),gudang:fd.get('gudang'),petugas:fd.get('petugas'),tanggal:tanggal});
+  let item = gudangBarang.find(x=>x.id===fd.get('id'));
+  if(item){ item.stok -= jumlah; if(item.stok<0)item.stok=0; item.tanggal_keluar=tanggal; renderGudang();}
+  renderKeluar(); e.target.reset(); bootstrap.Modal.getInstance(document.getElementById('modalKeluar')).hide();
+});
+
+// HAPUS & EDIT
+function hapusMaster(i){ if(confirm("Hapus?")){masterBarang.splice(i,1); renderMaster();} }
+function hapusGudang(i){ if(confirm("Hapus?")){gudangBarang.splice(i,1); renderGudang();} }
+function editMaster(i){ alert("Fitur Belum Tersedia versi Demo"); }
+function editGudang(i){ alert("Fitur Belum Tersedia versi Demo"); }
+
+// Render awal
+renderMaster(); renderGudang(); renderMasuk(); renderKeluar();
+</script>
+</body>
+</html>
